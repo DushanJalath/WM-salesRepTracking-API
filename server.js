@@ -3,7 +3,8 @@ import mysql from 'mysql'
 import cors from 'cors'
 
 const app=express();
-app.use(cors())
+app.use(cors());
+app.use(express.json());
 
 app.listen(8081,()=>{
     console.log('Listening')
@@ -13,7 +14,7 @@ const db=mysql.createConnection({
     host:"localhost",
     user:"root",
     password:"",
-    database:"crud"
+    database:"sales_track"
 })
 
 
@@ -37,17 +38,17 @@ app.get('/getSalesData',(req,res)=>{
 })
 
 app.post('/regUser',(req,res)=>{
-    const sql="INSERT INTO user (name,userName,pw,mobileNo,address,type,manageraId) VALUES (?,?,?,?,?,?,?)";
-    const values=[
+    const sql="INSERT INTO user (name, userName, pw, mobileNo, address, type ) VALUES (?,?,?,?,?,?)"
+    const values = [
         req.body.name,
         req.body.userName,
         req.body.pw,
         req.body.mobileNo,
         req.body.address,
         req.body.type,
-        req.body.managerId
-    ]
-    db.query(sql,[values],(err,result)=>{
+    ];
+    
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);
     })
