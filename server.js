@@ -69,7 +69,7 @@ app.post('/regCustomer',(req,res)=>{
 })
 
 
-app.post('/saveLocation',(req,result)=>{
+app.post('/saveLocation',(req,res)=>{
     const sql="INSERT INTO location (repId,location) VALUES (?,?)";
     const values=[
         req.body.repId,
@@ -104,7 +104,7 @@ app.post('/saveSale',(req,result)=>{
 })
 
 app.get('/login',(req,res)=>{
-    const sql="SELECT * WHERE userName=? AND pw=?";
+    const sql="SELECT * FROM user WHERE userName=? AND pw=?";
     const values=[
         req.body.userName,
         req.body.pw
