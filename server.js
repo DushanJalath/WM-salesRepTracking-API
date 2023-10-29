@@ -214,3 +214,49 @@ app.get('/customerSearch/:val',(req,res)=>{
         return res.json(result);
     })
 })
+
+
+app.get('/chechEnteredDate/:id',(req,res)=>{
+    const value=req.params.val;
+    const sql="SELECT time FROM sales WHERE salesId=?"
+    db.query(sql,value,(err,result)=>{
+        if(err){
+            return res.json({Message:"Error"})
+        }
+        const latestTimestamp = result;
+
+        const currentDate = new Date();
+        const timestampDiff = currentDate - latestTimestamp;
+
+  
+        const oneWeeksInMillis =  7 * 24 * 60 * 60 * 1000;
+        return timestampDiff <oneWeeksInMillis;
+    })
+})
+
+
+app.put('/updateSales',(req,res)=>{
+    const values=[       
+        req.body.repId,
+        req.body.customerId,
+        req.body.itemName,
+        req.body.qty,
+        req.body.paymentMethod,
+        req.body.bank,
+        req.body.branch,
+        req.body.cheque_no,
+        req.body.amount,
+        req.body.remarks,
+        req.body.salesId
+    ]
+
+    const sql="UPDATE sales SET repId=?,customerId=?,itemName=?,qty=?,paymentMethod=?,bank=?,branch=?,cheque_no=?,amount=?,remarks=? WHERE salesId=?"
+
+    db.query(sql,values,(err,result)=>{
+        if(err){
+            return res.json({Message:"Error"})
+        }
+
+        return res.json(result);
+    })
+})
