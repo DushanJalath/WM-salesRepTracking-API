@@ -11,10 +11,10 @@ app.listen(8081,()=>{
 })
 
 const db=mysql.createConnection({
-    host:"localhost",
-    user:"root",
-    password:"",
-    database:"rep_track"
+    host:"sql.freedb.tech",
+    user:"freedb_dushan",
+    password:"SDV2&2ey*PeeM$D",
+    database:"freedb_rep_track"
 })
 
 
