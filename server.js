@@ -20,7 +20,7 @@ const db=mysql.createConnection({
 
 app.get('/getCustomerSales',(req,res)=>{
     const sql="SELECT * FROM sales WHERE customerId=?";
-    const id=req.params.id;
+    const id=req.body.id;
     db.query(sql,[id],(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);

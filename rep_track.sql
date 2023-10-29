@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2023 at 06:53 AM
+-- Generation Time: Oct 29, 2023 at 09:53 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -86,6 +86,7 @@ CREATE TABLE `sales` (
   `paymentMethod` varchar(10) DEFAULT NULL,
   `bank` varchar(30) DEFAULT NULL,
   `branch` varchar(30) DEFAULT NULL,
+  `cheque_no` varchar(70) DEFAULT NULL,
   `amount` int(11) DEFAULT NULL,
   `remarks` varchar(150) NOT NULL,
   `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -95,12 +96,12 @@ CREATE TABLE `sales` (
 -- Dumping data for table `sales`
 --
 
-INSERT INTO `sales` (`salesId`, `repId`, `customerId`, `itemName`, `qty`, `paymentMethod`, `bank`, `branch`, `amount`, `remarks`, `time`) VALUES
-(1, 1, 1, 'Item1', 10, 'Cash', 'Bank1', 'Branch1', 100, 'Sale1', '2023-10-28 06:06:44'),
-(2, 1, 2, 'Item2', 5, 'Credit', 'Bank2', 'Branch2', 50, 'Sale2', '2023-10-28 06:06:44'),
-(3, 2, 3, 'Item3', 8, 'Cash', 'Bank1', 'Branch1', 80, 'Sale3', '2023-10-28 06:06:44'),
-(4, 2, 4, 'Item4', 12, 'Credit', 'Bank2', 'Branch2', 120, 'Sale4', '2023-10-28 06:06:44'),
-(5, 2, 5, 'Item5', 15, 'Cash', 'Bank3', 'Branch3', 150, 'Sale5', '2023-10-28 06:06:44');
+INSERT INTO `sales` (`salesId`, `repId`, `customerId`, `itemName`, `qty`, `paymentMethod`, `bank`, `branch`, `cheque_no`, `amount`, `remarks`, `time`) VALUES
+(1, 1, 1, 'Item1', 10, 'Cash', 'Bank1', 'Branch1', NULL, 100, 'Sale1', '2023-10-28 06:06:44'),
+(2, 1, 2, 'Item2', 5, 'Credit', 'Bank2', 'Branch2', NULL, 50, 'Sale2', '2023-10-28 06:06:44'),
+(3, 2, 3, 'Item3', 8, 'Cash', 'Bank1', 'Branch1', NULL, 80, 'Sale3', '2023-10-28 06:06:44'),
+(4, 2, 4, 'Item4', 12, 'Credit', 'Bank2', 'Branch2', NULL, 120, 'Sale4', '2023-10-28 06:06:44'),
+(5, 2, 5, 'Item5', 15, 'Cash', 'Bank3', 'Branch3', NULL, 150, 'Sale5', '2023-10-28 06:06:44');
 
 -- --------------------------------------------------------
 
