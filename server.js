@@ -18,7 +18,7 @@ const db=mysql.createConnection({
 })
 
 
-app.get('/getCustomerSales',(req,res)=>{
+app.post('/getCustomerSales',(req,res)=>{
     const sql="SELECT * FROM sales WHERE customerId=?";
     const id=req.body.id;
     db.query(sql,[id],(err,result)=>{
