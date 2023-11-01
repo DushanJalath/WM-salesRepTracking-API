@@ -27,12 +27,55 @@ SET time_zone = "+00:00";
 -- Table structure for table `customer`
 --
 
-CREATE TABLE `customer` (
+
+
+CREATE TABLE `user` (
   `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `userName` varchar(20) NOT NULL,
+  `pw` varchar(20) NOT NULL,
+  `mobileNo` varchar(15) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `managerId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `name`, `userName`, `pw`, `mobileNo`, `address`, `type`, `managerId`) VALUES
+(1, 'User1', 'user1', 'userpass1', '1111111111', 'Address1', 'salesperson', NULL),
+(2, 'User2', 'user2', 'userpass2', '2222222222', 'Address2', 'salesperson', 1),
+(3, 'User3', 'user3', 'userpass3', '3333333333', 'Address3', 'salesperson', NULL),
+(4, 'User4', 'user4', 'userpass4', '4444444444', 'Address4', 'salesperson', 2),
+(5, 'User5', 'user5', 'userpass5', '5555555555', 'Address5', 'salesperson', 2),
+(6, 'John Doe', 'johndoe', 'password123', '1234567890', '123 Main St, City', 'user', NULL);
+
+
+
+CREATE TABLE `location` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `repId` int(11) NOT NULL,
+   `lat` float NOT NULL,
+   `lng` float NOT NULL,
+  `timeStamp` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (repId) REFERENCES user(id)  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- Create the customer table
+CREATE TABLE `customer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `address` varchar(200) DEFAULT NULL,
   `mobileNo` varchar(15) NOT NULL,
-  `repId` int(11) NOT NULL
+  `repId` int(11) NOT NULL,
+  `lat` float NOT NULL,
+  `lng` float NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (repId) REFERENCES user(id)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -48,16 +91,7 @@ INSERT INTO `customer` (`id`, `name`, `address`, `mobileNo`, `repId`) VALUES
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `location`
---
 
-CREATE TABLE `location` (
-  `id` int(11) NOT NULL,
-  `repId` int(11) NOT NULL,
-  `location` varchar(100) NOT NULL,
-  `timeStamp` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `location`
@@ -109,28 +143,6 @@ INSERT INTO `sales` (`salesId`, `repId`, `customerId`, `itemName`, `qty`, `payme
 -- Table structure for table `user`
 --
 
-CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `userName` varchar(20) NOT NULL,
-  `pw` varchar(20) NOT NULL,
-  `mobileNo` varchar(15) NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `type` varchar(20) NOT NULL,
-  `managerId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`id`, `name`, `userName`, `pw`, `mobileNo`, `address`, `type`, `managerId`) VALUES
-(1, 'User1', 'user1', 'userpass1', '1111111111', 'Address1', 'salesperson', NULL),
-(2, 'User2', 'user2', 'userpass2', '2222222222', 'Address2', 'salesperson', 1),
-(3, 'User3', 'user3', 'userpass3', '3333333333', 'Address3', 'salesperson', NULL),
-(4, 'User4', 'user4', 'userpass4', '4444444444', 'Address4', 'salesperson', 2),
-(5, 'User5', 'user5', 'userpass5', '5555555555', 'Address5', 'salesperson', 2),
-(6, 'John Doe', 'johndoe', 'password123', '1234567890', '123 Main St, City', 'user', NULL);
 
 --
 -- Indexes for dumped tables

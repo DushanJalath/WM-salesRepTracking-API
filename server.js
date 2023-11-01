@@ -216,6 +216,32 @@ app.get('/customerSearch/:val',(req,res)=>{
 })
 
 
+app.get('/getCustomerById',(req,res)=>{
+    const id=req.body.id;
+    const sql="SELECT * FROM customer WHERE id=?"
+    db.query(sql,id,(err,result)=>{
+        if(err){
+            return res.json({Message:"Error"})
+        }
+        return res.json(result);
+    })
+})
+
+
+app.get('/getCustomerByName',(req,res)=>{
+    const nme=req.body.name;
+    const sql="SELECT * FROM customer WHERE name=?"
+    db.query(sql,nme,(err,result)=>{
+        if(err){
+            return res.json({Message:"Error"})
+        }
+        return res.json(result);
+    })
+
+})
+
+
+
 app.get('/chechEnteredDate/:id',(req,res)=>{
     const value=req.params.val;
     const sql="SELECT time FROM sales WHERE salesId=?"
