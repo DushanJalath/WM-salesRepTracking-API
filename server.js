@@ -1,6 +1,7 @@
 import express from 'express'
 import mysql from 'mysql'
 import cors from 'cors'
+require('dotenv').config();
 
 const app=express();
 app.use(cors());
@@ -10,13 +11,12 @@ app.listen(8081,()=>{
     console.log('Listening')
 })
 
-const db=mysql.createConnection({
-    host:"sql.freedb.tech",
-    user:"freedb_dushan",
-    password:"SDV2&2ey*PeeM$D",
-    database:"freedb_rep_track"
-})
-
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+});
 
 app.post('/getCustomerSales',(req,res)=>{
     const sql="SELECT * FROM sales WHERE customerId=?";
@@ -116,7 +116,7 @@ app.post('/saveSale',(req,result)=>{
 
 })
 
-app.get('/login',(req,res)=>{
+app.post('/login',(req,res)=>{
     const sql="SELECT * FROM user WHERE userName=? AND pw=?";
     const values=[
         req.body.userName,
@@ -215,7 +215,6 @@ app.get('/customerSearch/:val',(req,res)=>{
     })
 })
 
-
 app.get('/getCustomerById',(req,res)=>{
     const id=req.body.id;
     const sql="SELECT * FROM customer WHERE id=?"
@@ -226,7 +225,6 @@ app.get('/getCustomerById',(req,res)=>{
         return res.json(result);
     })
 })
-
 
 app.get('/getCustomerByName',(req,res)=>{
     const nme=req.body.name;
