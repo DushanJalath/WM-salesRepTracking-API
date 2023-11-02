@@ -1,14 +1,22 @@
 import express from 'express'
 import mysql from 'mysql'
 import cors from 'cors'
-require('dotenv').config();
+import {config} from 'dotenv'
 
 const app=express();
+config();
 app.use(cors());
 app.use(express.json());
 
 app.listen(8081,()=>{
     console.log('Listening')
+    db.connect((err)=>{
+        if(err){
+            console.error("Database not connecting",err);
+            return
+        }
+        console.log("Databse conected");
+    });
 })
 
 const db = mysql.createConnection({
