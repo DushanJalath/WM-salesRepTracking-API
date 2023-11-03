@@ -29,7 +29,7 @@ const db = mysql.createConnection({
 app.post('/getCustomerSales',(req,res)=>{
     const sql="SELECT * FROM sales WHERE customerId=?";
     const id=req.body.id;
-    db.query(sql,[id],(err,result)=>{
+    db.query(sql,id,(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);
 
@@ -83,7 +83,7 @@ app.post('/regCustomer',(req,res)=>{
         req.body.mobileNo,
         req.body.repId
     ]
-    db.query(sql,[values],(err,result)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);
     })
@@ -117,7 +117,7 @@ app.post('/saveSale',(req,result)=>{
         req.body.remarks
     ]
 
-    db.query(sql,[values],(err,res)=>{
+    db.query(sql,values,(err,res)=>{
         if(err) return res.json(err)
         return res.json(result)
     })
@@ -131,7 +131,7 @@ app.post('/login',(req,res)=>{
         req.body.pw
     ]
 
-    db.query(sql,[values],(err,result)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json(err)
         return res.json(result)
     })
@@ -166,7 +166,7 @@ app.get('/getCustomerDetails',(req,res)=>{
         req.body.name,
         req.body.mobileNo
     ]
-    db.query(sql,[values],(err,result)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result);
     })
@@ -177,7 +177,7 @@ app.get('/getReps/:managerId', (req, res) => {
 
     const sql = "SELECT * FROM user WHERE managerId = ?";
 
-    db.query(sql, [manageId], (err, result) => {
+    db.query(sql, manageId, (err, result) => {
         if (err) {
             return res.json({ Message: "Error" });
         }
