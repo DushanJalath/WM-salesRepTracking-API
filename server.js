@@ -8,7 +8,7 @@ config();
 app.use(cors());
 app.use(express.json());
 
-app.listen(8081,()=>{
+app.listen(8080,()=>{
     console.log('Listening')
     db.connect((err)=>{
         if(err){
