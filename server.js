@@ -113,6 +113,21 @@ app.get('/getrepContacts/:repId', (req, res) => {
     })
 })
 
+app.get('/getRepsLocation/:repId', (req, res) => {
+    const repId = req.params.repId;
+
+    const sql = "SELECT lat,lng FROM location WHERE repId = ?";
+
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json({Message: "Error"});
+        }
+        console.log(result);
+        return res.json(result);
+    })
+})
+
+
 app.get('/getSalesDataBydate/:repId', (req, res) => {
     const repId = req.params.repId;
     const currentDate = new Date().toISOString().slice(0, 10); // Get the current date in 'YYYY-MM-DD' format
@@ -249,6 +264,19 @@ app.get('/getReps/:managerId', (req, res) => {
     });
 });
 
+app.get('/getReps/:repId', (req, res) => {
+    const repId = req.params.repId;
+
+    const sql = "SELECT * FROM user WHERE id = ?";
+
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json({Message: "Error"});
+        }
+        return res.json(result);
+    });
+});
+
 
 app.get('/checkLastVisit',(req,res)=>{
     const values=[
@@ -356,3 +384,65 @@ app.put('/updateSales',(req,res)=>{
         return res.json(result);
     })
 })
+
+app.get('/getCustomerLocations', (req, res) => {
+    const sql = "SELECT lat,lng FROM customer"
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getAllCustomerDetails', (req, res) => {
+    const sql = "SELECT * FROM customer"
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json({Message: "Error"})
+        return res.json(result);
+    })
+})
+
+
+app.get('/leaderlogin', (req, res) => {
+    const {userName, pw} = req.query;
+    const type = "leader";
+    const sql = "SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
+    const values = [
+        userName,
+        pw,
+        type
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (result.length > 0) {
+            return res.json(result);
+        } else {
+            return res.status(401).send('Login failed');
+        }
+    });
+});
+
+app.get('/adminlogin', (req, res) => {
+    const {userName, pw} = req.query;
+    const type = "admin";
+    const sql = "SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
+    const values = [
+        userName,
+        pw,
+        type
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (result.length > 0) {
+            return res.send('Login successful');
+        } else {
+            return res.status(401).send('Login failed');
+        }
+    });
+});
