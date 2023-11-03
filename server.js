@@ -74,6 +74,70 @@ app.post('/regUser',(req,res)=>{
     })
 })
 
+app.get('/SalesData/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM sales WHERE salesId = ?"
+
+    db.query(sql, id, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getSalesData/:repsId', (req, res) => {
+    const repId = req.params.repsId;
+    const sql = "SELECT * FROM sales WHERE repId = ?"
+
+    db.query(sql, repId, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getrepContact', (req, res) => {
+    const sql = "SELECT id,mobileNo FROM user"
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getrepContacts/:repId', (req, res) => {
+    const repId = req.params.repId;
+    const sql = "SELECT mobileNo FROM user WHERE id = ?"
+
+    db.query(sql,repId, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getSalesDataBydate/:repId', (req, res) => {
+    const repId = req.params.repId;
+    const currentDate = new Date().toISOString().slice(0, 10); // Get the current date in 'YYYY-MM-DD' format
+    const sql = "SELECT * FROM sales WHERE repId = ? AND DATE(time) = ?";
+
+    db.query(sql, [repId, currentDate], (err, result) => {
+        if (err) return res.json(err);
+        return res.json(result);
+    })
+})
+
+app.post('/saveLocation',(req,res)=>{
+    const sql="INSERT INTO location (repId,location) VALUES (?,?)";
+    const values=[
+        req.body.repId,
+        req.body.lat,
+        req.body.long
+    ]
+
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
 
 app.post('/regCustomer',(req,res)=>{
     const sql="INSERT INTO customer (name,address,mobileNo,repId) VALUES (?,?,?,?)";
