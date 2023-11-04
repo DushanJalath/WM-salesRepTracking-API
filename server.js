@@ -203,6 +203,7 @@ app.post('/saveSale',(req,res)=>{
         req.body.qty,
         req.body.paymentMethod,
         req.body.bank,
+        req.body.chequeNo,
         req.body.branch,
         req.body.amount,
         req.body.remarks
@@ -212,8 +213,8 @@ app.post('/saveSale',(req,res)=>{
         if(err) return res.json(err)
         return res.json(result)
     })
-
 })
+
 
 app.post('/login',(req,res)=>{
     const sql="SELECT * FROM user WHERE userName=? AND pw=?";
