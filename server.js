@@ -140,7 +140,7 @@ app.get('/getSalesDataBydate/:repId', (req, res) => {
 })
 
 app.post('/saveLocation',(req,res)=>{
-    const sql="INSERT INTO location (repId,location) VALUES (?,?)";
+    const sql="INSERT INTO location (repId,lat,lng) VALUES (?,?,?)";
     const values=[
         req.body.repId,
         req.body.lat,
