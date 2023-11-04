@@ -331,7 +331,7 @@ app.get('/customerSearch/:val',(req,res)=>{
     })
 })
 
-app.get('/getCustomerById',(req,res)=>{
+app.post('/getCustomerById',(req,res)=>{
     const id=req.body.id;
     const sql="SELECT * FROM customer WHERE id=?"
     db.query(sql,id,(err,result)=>{
@@ -342,7 +342,7 @@ app.get('/getCustomerById',(req,res)=>{
     })
 })
 
-app.get('/getCustomerByName',(req,res)=>{
+app.post('/getCustomerByName',(req,res)=>{
     const nme=req.body.name;
     const sql="SELECT * FROM customer WHERE name=?"
     db.query(sql,nme,(err,result)=>{
