@@ -312,7 +312,7 @@ app.get('/checkLastVisit',(req,res)=>{
 
   
         const twoWeeksInMillis = 2 * 7 * 24 * 60 * 60 * 1000;
-        return timestampDiff > twoWeeksInMillis;
+         return res.json({ isWithinOneWeek: timestampDiff > twoWeeksInMillis });
     })
 })
 
@@ -370,7 +370,7 @@ app.get('/chechEnteredDate/:id',(req,res)=>{
 
   
         const oneWeeksInMillis =  7 * 24 * 60 * 60 * 1000;
-        return timestampDiff <oneWeeksInMillis;
+         return res.json({ isWithinOneWeek: timestampDiff < oneWeeksInMillis });
     })
 })
 
