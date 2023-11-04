@@ -216,19 +216,33 @@ app.post('/login',(req,res)=>{
     })
 })
 
-app.get('/getReps',(req,res)=>{
-    const sql="SELECT * FROM user WHERE type=rep"
+app.get('/getReps', (req, res) => {
+    const type = "rep";
+    const sql = "SELECT * FROM user WHERE type=?"
 
-    db.query(sql,(err,result)=>{
-        if(err) return res.json({Message:"Error"})
+    db.query(sql, type, (err, result) => {
+        if (err) return res.json({Message: "Error"})
         return res.json(result)
     })
 })
+app.get('/getReps/:managerId', (req, res) => {
+    const manageId = req.params.managerId;
+
+    const sql = "SELECT * FROM user WHERE managerId = ?";
+
+    db.query(sql, manageId, (err, result) => {
+        if (err) {
+            return res.json({ Message: "Error" });
+        }
+        return res.json(result);
+    });
+});
 
 app.get('/getSalesLeaders',(req,res)=>{
-    const sql ="SELECT * FROM user WHERE type=leader"
+    const val='leader'
+    const sql ="SELECT * FROM user WHERE type=?"
 
-    db.query(sql,(err,result)=>{
+    db.query(sql,val,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result)
     })
@@ -251,18 +265,7 @@ app.get('/getCustomerDetails',(req,res)=>{
     })
 })
 
-app.get('/getReps/:managerId', (req, res) => {
-    const manageId = req.params.managerId;
 
-    const sql = "SELECT * FROM user WHERE managerId = ?";
-
-    db.query(sql, manageId, (err, result) => {
-        if (err) {
-            return res.json({ Message: "Error" });
-        }
-        return res.json(result);
-    });
-});
 
 app.get('/getReps/:repId', (req, res) => {
     const repId = req.params.repId;
@@ -341,7 +344,7 @@ app.get('/getCustomerByName',(req,res)=>{
 
 
 app.get('/chechEnteredDate/:id',(req,res)=>{
-    const value=req.params.val;
+    const value=req.params.id;
     const sql="SELECT time FROM sales WHERE salesId=?"
     db.query(sql,value,(err,result)=>{
         if(err){
