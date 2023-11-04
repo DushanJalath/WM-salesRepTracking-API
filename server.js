@@ -94,6 +94,18 @@ app.get('/getSalesData/:repsId', (req, res) => {
     })
 })
 
+app.post('/getCustomerSalesByRep',(req,res)=>{
+    const sql="SELECT * FROM sales WHERE repId=?";
+    const id=req.body.id;
+    db.query(sql,id,(err,result)=>{
+        if(err) return res.json(err);
+        return res.json(result);
+
+    })
+})
+
+
+
 app.get('/getrepContact', (req, res) => {
     const sql = "SELECT id,mobileNo FROM user"
 
