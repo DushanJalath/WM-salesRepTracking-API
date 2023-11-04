@@ -194,7 +194,7 @@ app.post('/saveLocation',(req,res)=>{
     })
 })
 
-app.post('/saveSale',(req,result)=>{
+app.post('/saveSale',(req,res)=>{
     const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,cheque_no,branch,amount,remarks) VALUES (?,?,?,?,?,?,?,?,?,?)"
     const values=[
         req.body.repId,
@@ -208,7 +208,7 @@ app.post('/saveSale',(req,result)=>{
         req.body.remarks
     ]
 
-    db.query(sql,values,(err,res)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json(err)
         return res.json(result)
     })
