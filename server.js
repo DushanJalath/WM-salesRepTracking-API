@@ -183,7 +183,7 @@ app.post('/saveLocation',(req,res)=>{
 })
 
 app.post('/saveSale',(req,result)=>{
-    const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,branch,amount,remarks,time) VALUES (?,?,?,?,?,?,?,?,?,?)"
+    const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,cheque_no,branch,amount,remarks) VALUES (?,?,?,?,?,?,?,?,?,?)"
     const values=[
         req.body.repId,
         req.body.customerId,
