@@ -462,3 +462,34 @@ app.get('/adminlogin', (req, res) => {
         }
     });
 });
+
+app.put('/updateUser', (req, res) => {
+  
+    const sql = 'UPDATE user SET name = ?,userName = ?,pw = ?,mobileNo = ?,address = ?,type = ?,managerId = ? WHERE id =';
+  
+    const values = [
+        req.body.name,
+        req.body.userName,
+        req.body.pw,
+        req.body.mobileNo,
+        req.body.address,
+        req.body.type,
+        req.body.manageId,
+        req.body.id
+    ];
+  
+    db.query(sql, values, (err, result) => {
+        if (err) return res.json({Message: "Error"})
+        return res.json(result);
+    })
+  })
+
+  app.delete('/deletUser/:id',(req,res)=>{
+    const sql="DELET FROM user WHERE id =?"
+    const id=req.params.id;
+
+    db.query(sql,id,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result)
+    })
+  })
