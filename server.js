@@ -280,8 +280,8 @@ app.get('/getCustomerDetails',(req,res)=>{
 
 
 
-app.get('/getReps/:repId', (req, res) => {
-    const repId = req.params.repId;
+app.get('/getReps/:id', (req, res) => {
+    const repId = req.params.id;
 
     const sql = "SELECT * FROM user WHERE id = ?";
 
@@ -293,28 +293,50 @@ app.get('/getReps/:repId', (req, res) => {
     });
 });
 
+app.post('/checkLastVisit', (req, res) => {
+    console.log(req.body);
+    const repId = req.body.repId; // Get repId from query parameters
+    const twoWeeksInMillis = 2 * 7 * 24 * 60 * 60 * 1000; // Two weeks in milliseconds
 
-app.get('/checkLastVisit',(req,res)=>{
-    const values=[
-            req.body.repId,
-            req.body.customerId
-    ]
-    const sql="SELECT * FROM sales WHERE repId=? AND customerId=? ORDER BY time ASC"
+    const sql = `
+        SELECT c.id, MAX(s.time) AS lastSaleTime
+        FROM customer AS c
+        LEFT JOIN sales AS s ON c.id = s.customerId
+        WHERE c.repId = ? AND s.repId = ?
+        GROUP BY c.id
+    `;
 
-    db.query(sql,values,(err,result)=>{
-        if(err){
-            return res.json({Message:"Error"})
+    const values = [repId, repId];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json({ Message: "Error" });
         }
-        const latestTimestamp = result[0].time;
 
         const currentDate = new Date();
-        const timestampDiff = currentDate - latestTimestamp;
+        const customers = result.map((row) => {
+            const lastSaleTime = row.lastSaleTime ? new Date(row.lastSaleTime) : null;
+            const isWithinTwoWeeks =
+                lastSaleTime !== null && currentDate - lastSaleTime <= twoWeeksInMillis;
 
-  
-        const twoWeeksInMillis = 2 * 7 * 24 * 60 * 60 * 1000;
-         return res.json({ isWithinOneWeek: timestampDiff > twoWeeksInMillis });
-    })
-})
+            return {
+                customerId: row.id,
+                lastSaleTime: lastSaleTime,
+                isWithinTwoWeeks: isWithinTwoWeeks,
+            };
+        });
+
+        const customersNotVisitedWithinTwoWeeks = customers
+            .filter((customer) => !customer.isWithinTwoWeeks)
+            .map((customer) => customer.customerId); // Extract only the customer IDs
+
+        const customerIdsCSV = customersNotVisitedWithinTwoWeeks.join(','); // Convert to a comma-separated string
+
+        return res.json({ customerIds: customerIdsCSV }); // Send the comma-separated list in the response
+    });
+});
+
+
 
 app.get('/customerSearch/:val',(req,res)=>{
     const value=req.params.val
@@ -464,9 +486,9 @@ app.get('/adminlogin', (req, res) => {
 });
 
 app.put('/updateUser', (req, res) => {
-  
-    const sql = 'UPDATE user SET name = ?,userName = ?,pw = ?,mobileNo = ?,address = ?,type = ?,managerId = ? WHERE id =';
-  
+
+    const sql = 'UPDATE user SET name = ?,userName = ?,pw = ?,mobileNo = ?,address = ?,type = ?,managerId = ? WHERE id =?';
+
     const values = [
         req.body.name,
         req.body.userName,
@@ -477,19 +499,19 @@ app.put('/updateUser', (req, res) => {
         req.body.manageId,
         req.body.id
     ];
-  
+
     db.query(sql, values, (err, result) => {
         if (err) return res.json({Message: "Error"})
         return res.json(result);
     })
-  })
+})
 
-  app.delete('/deletUser/:id',(req,res)=>{
-    const sql="DELET FROM user WHERE id =?"
+app.delete('/deletUser/:id',(req,res)=>{
+    const sql="DELETE FROM user WHERE id =?"
     const id=req.params.id;
 
     db.query(sql,id,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result)
     })
-  })
+})
