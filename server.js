@@ -167,12 +167,14 @@ app.post('/saveLocation',(req,res)=>{
 
 
 app.post('/regCustomer',(req,res)=>{
-    const sql="INSERT INTO customer (name,address,mobileNo,repId) VALUES (?,?,?,?)";
+    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng) VALUES (?,?,?,?,?,?)";
     const values=[
         req.body.name,
         req.body.address,
         req.body.mobileNo,
-        req.body.repId
+        req.body.repId,
+        req.body.lat,
+        req.body.lng
     ]
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
