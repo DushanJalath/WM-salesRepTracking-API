@@ -231,7 +231,20 @@ app.post('/login',(req,res)=>{
     })
 })
 
-app.get('/getReps', (req, res) => {
+app.get('/getReps/:id', (req, res) => {
+    const repId = req.params.id;
+
+    const sql = "SELECT * FROM user WHERE id = ?";
+
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json({Message: "Error"});
+        }
+        return res.json(result);
+    });
+});
+
+app.get('/getAllReps', (req, res) => {
     const type = "rep";
     const sql = "SELECT * FROM user WHERE type=?"
 
@@ -240,7 +253,8 @@ app.get('/getReps', (req, res) => {
         return res.json(result)
     })
 })
-app.get('/getReps/:managerId', (req, res) => {
+
+app.get('/getRepsByManager/:managerId', (req, res) => {
     const manageId = req.params.managerId;
 
     const sql = "SELECT * FROM user WHERE managerId = ?";
@@ -281,19 +295,6 @@ app.get('/getCustomerDetails',(req,res)=>{
 })
 
 
-
-app.get('/getReps/:id', (req, res) => {
-    const repId = req.params.id;
-
-    const sql = "SELECT * FROM user WHERE id = ?";
-
-    db.query(sql, repId, (err, result) => {
-        if (err) {
-            return res.json({Message: "Error"});
-        }
-        return res.json(result);
-    });
-});
 
 app.post('/checkLastVisit', (req, res) => {
     console.log(req.body);
