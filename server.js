@@ -500,7 +500,7 @@ app.put('/updateUser', (req, res) => {
         req.body.mobileNo,
         req.body.address,
         req.body.type,
-        req.body.manageId,
+        req.body.managerId,
         req.body.id
     ];
 
