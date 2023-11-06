@@ -219,10 +219,11 @@ app.post('/saveSale',(req,res)=>{
 
 
 app.post('/login',(req,res)=>{
-    const sql="SELECT * FROM user WHERE userName=? AND pw=?";
+    const sql="SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
     const values=[
         req.body.userName,
-        req.body.pw
+        req.body.pw,
+        'rep'
     ]
 
     db.query(sql,values,(err,result)=>{
@@ -509,9 +510,12 @@ app.put('/updateUser', (req, res) => {
     })
 })
 
-app.delete('/deletUser/:id',(req,res)=>{
-    const sql="DELETE FROM user WHERE id =?"
-    const id=req.params.id;
+app.put('/deletUser/:id',(req,res)=>{
+    const sql="UPDATE user SET type=? WHERE id =?"
+    const values=[
+        'nullUser',
+        req.params.id
+    ]
 
     db.query(sql,id,(err,result)=>{
         if(err) return res.json({Message:"Error"})
