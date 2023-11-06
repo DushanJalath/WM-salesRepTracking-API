@@ -84,15 +84,24 @@ app.get('/SalesData/:id', (req, res) => {
     })
 })
 
-app.get('/getSalesData/:repsId', (req, res) => {
-    const repId = req.params.repsId;
-    const sql = "SELECT * FROM sales WHERE repId = ?"
+app.get('/getSalesData/:id', (req, res) => {
+    const repId = req.params.id;
+
+    // Corrected SQL query with JOIN to fetch sales data and rep details
+    const sql = `
+        SELECT u.name, u.mobileNo, s.*
+        FROM user AS u
+        LEFT JOIN sales AS s ON u.id = s.repId
+        WHERE u.id = ?;
+    `;
 
     db.query(sql, repId, (err, result) => {
-        if (err) return res.json(err)
+        if (err) {
+            return res.json(err);
+        }
         return res.json(result);
-    })
-})
+    });
+});
 
 app.post('/getCustomerSalesByRep',(req,res)=>{
     const sql="SELECT * FROM sales WHERE repId=?";
