@@ -235,9 +235,12 @@ app.post('/login',(req,res)=>{
         'rep'
     ]
 
-    db.query(sql,values,(err,result)=>{
-        if(err) return res.json(err)
-        return res.json(result)
+    db.query(sql, values, (err, result) => {
+    if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+    return res.json(result);
     })
 })
 
