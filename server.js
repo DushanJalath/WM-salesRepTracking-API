@@ -197,20 +197,6 @@ app.post('/regCustomer',(req,res)=>{
     })
 })
 
-
-app.post('/saveLocation',(req,res)=>{
-    const sql="INSERT INTO location (repId,location) VALUES (?,?)";
-    const values=[
-        req.body.repId,
-        req.body.location
-    ]
-
-    db.query(sql,values,(err,result)=>{
-        if(err) return res.json(err)
-        return res.json(result);
-    })
-})
-
 app.post('/saveSale',(req,res)=>{
     const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,cheque_no,branch,amount,remarks) VALUES (?,?,?,?,?,?,?,?,?,?)"
     const values=[
