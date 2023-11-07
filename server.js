@@ -143,7 +143,7 @@ app.get('/getrepContacts/:repId', (req, res) => {
 app.get('/getRepsLocation/:repId', (req, res) => {
     const repId = req.params.repId;
 
-    const sql = "SELECT lat,lng FROM location WHERE repId = ?";
+    const sql = "SELECT lat, lng FROM location WHERE repId = ? AND DATE(timestamp) = CURDATE()";
 
     db.query(sql, repId, (err, result) => {
         if (err) {
