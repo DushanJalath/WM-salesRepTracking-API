@@ -70,7 +70,13 @@ app.post('/regUser',(req,res)=>{
     
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
-        return res.json(result);
+        const response = {
+            userName: req.body.userName,
+            generatedPassword: generatedPassword,
+            result: result
+        };
+
+        return res.json(response);
     })
 })
 
@@ -529,7 +535,7 @@ app.put('/deletUser/:id',(req,res)=>{
         req.params.id
     ]
 
-    db.query(sql,id,(err,result)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result)
     })
