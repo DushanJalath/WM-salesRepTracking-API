@@ -71,7 +71,7 @@ INSERT INTO `customer` (`id`, `name`, `address`, `mobileNo`, `repId`) VALUES
 --
 
 CREATE TABLE `sales` (
-  `salesId` int NOT NULL,
+  `salesId` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `repId` int NOT NULL,
   `customerId` int NOT NULL,
   `itemName` varchar(60) DEFAULT NULL,
@@ -82,7 +82,9 @@ CREATE TABLE `sales` (
   `cheque_no` varchar(70) DEFAULT NULL,
   `amount` int DEFAULT NULL,
   `remarks` varchar(150) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  FOREIGN KEY (repId) REFERENCES user(id)  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (customerId) REFERENCES customer(id)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ;
 
 --

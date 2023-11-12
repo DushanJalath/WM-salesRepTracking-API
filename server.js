@@ -2,13 +2,14 @@ import express from 'express'
 import mysql from 'mysql'
 import cors from 'cors'
 import {config} from 'dotenv'
+import jwt from 'jsonwebtoken'
 
 const app=express();
 config();
 app.use(cors());
 app.use(express.json());
 
-app.listen(8081,()=>{
+app.listen(8080,()=>{
     console.log('Listening')
     db.connect((err)=>{
         if(err){
@@ -26,17 +27,33 @@ const db = mysql.createConnection({
     database: process.env.DB_DATABASE,
 });
 
-app.post('/getCustomerSales',(req,res)=>{
+const verifyJwt=(req,res,next)=>{
+    const token=req.headers["access-token"];
+    if(!token){
+        return res.json("we need token");
+    }else{
+        jwt.verify(token,process.env.JWT_SECRET_KEY,(err,decoded)=>{
+            if(err){
+                res.json("Not authenticated");
+            }else{
+                req.userId=decoded.id;
+                next();
+            }
+        })
+    }
+}
+
+app.post('/getCustomerSales',verifyJwt,(req,res)=>{
     const sql="SELECT * FROM sales WHERE customerId=?";
     const id=req.body.id;
-    db.query(sql,[id],(err,result)=>{
+    db.query(sql,id,(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);
 
     })
 })
 
-app.get('/getSalesData',(req,res)=>{
+app.get('/getSalesData',verifyJwt,(req,res)=>{
     const sql="SELECT * FROM sales"
     
     db.query(sql,(err,result)=>{
@@ -56,7 +73,7 @@ function generateRandomPassword(length) {
 }
 
 
-app.post('/regUser',(req,res)=>{
+app.post('/regUser',verifyJwt,(req,res)=>{
     const generatedPassword = generateRandomPassword(8);
     const sql="INSERT INTO user (name, userName, pw, mobileNo, address, type ) VALUES (?,?,?,?,?,?)"
     const values = [
@@ -70,31 +87,108 @@ app.post('/regUser',(req,res)=>{
     
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
+        const response = {
+            userName: req.body.userName,
+            generatedPassword: generatedPassword,
+            result: result
+        };
+
+        return res.json(response);
+    })
+})
+
+app.get('/SalesData/:id', verifyJwt,(req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM sales WHERE salesId = ?"
+
+    db.query(sql, id, (err, result) => {
+        if (err) return res.json(err)
         return res.json(result);
     })
 })
 
+app.get('/getSalesData/:id', verifyJwt,(req, res) => {
+    const repId = req.params.id;
 
-app.post('/regCustomer',(req,res)=>{
-    const sql="INSERT INTO customer (name,address,mobileNo,repId) VALUES (?,?,?,?)";
-    const values=[
-        req.body.name,
-        req.body.address,
-        req.body.mobileNo,
-        req.body.repId
-    ]
-    db.query(sql,[values],(err,result)=>{
+    // Corrected SQL query with JOIN to fetch sales data and rep details
+    const sql = `
+        SELECT u.name, u.mobileNo, s.*
+        FROM user AS u
+        LEFT JOIN sales AS s ON u.id = s.repId
+        WHERE u.id = ?;
+    `;
+
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json(result);
+    });
+});
+
+app.post('/getCustomerSalesByRep',verifyJwt,(req,res)=>{
+    const sql="SELECT * FROM sales WHERE repId=?";
+    const id=req.body.id;
+    db.query(sql,id,(err,result)=>{
         if(err) return res.json(err);
         return res.json(result);
+
     })
 })
 
 
-app.post('/saveLocation',(req,res)=>{
-    const sql="INSERT INTO location (repId,location) VALUES (?,?)";
+
+app.get('/getrepContact', verifyJwt,(req, res) => {
+    const sql = "SELECT id,mobileNo FROM user"
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getrepContacts/:repId', verifyJwt,(req, res) => {
+    const repId = req.params.repId;
+    const sql = "SELECT mobileNo FROM user WHERE id = ?"
+
+    db.query(sql,repId, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getRepsLocation/:repId', verifyJwt,(req, res) => {
+    const repId = req.params.repId;
+
+    const sql = "SELECT lat, lng FROM location WHERE repId = ? AND DATE(timestamp) = CURDATE()";
+
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json({Message: "Error"});
+        }
+        console.log(result);
+        return res.json(result);
+    })
+})
+
+
+app.get('/getSalesDataBydate/:repId', verifyJwt,(req, res) => {
+    const repId = req.params.repId;
+    const currentDate = new Date().toISOString().slice(0, 10); // Get the current date in 'YYYY-MM-DD' format
+    const sql = "SELECT * FROM sales WHERE repId = ? AND DATE(time) = ?";
+
+    db.query(sql, [repId, currentDate], (err, result) => {
+        if (err) return res.json(err);
+        return res.json(result);
+    })
+})
+
+app.post('/saveLocation',verifyJwt,(req,res)=>{
+    const sql="INSERT INTO location (repId,lat,lng) VALUES (?,?,?)";
     const values=[
         req.body.repId,
-        req.body.location
+        req.body.lat,
+        req.body.long
     ]
 
     db.query(sql,values,(err,result)=>{
@@ -103,8 +197,25 @@ app.post('/saveLocation',(req,res)=>{
     })
 })
 
-app.post('/saveSale',(req,result)=>{
-    const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,branch,amount,remarks,time) VALUES (?,?,?,?,?,?,?,?,?,?)"
+
+app.post('/regCustomer',verifyJwt,(req,res)=>{
+    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng) VALUES (?,?,?,?,?,?)";
+    const values=[
+        req.body.name,
+        req.body.address,
+        req.body.mobileNo,
+        req.body.repId,
+        req.body.lat,
+        req.body.lng
+    ]
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json(err);
+        return res.json(result);
+    })
+})
+
+app.post('/saveSale',verifyJwt,(req,res)=>{
+    const sql="INSERT INTO sales (repId,customerId,itemName,qty,paymentMethod,bank,cheque_no,branch,amount,remarks) VALUES (?,?,?,?,?,?,?,?,?,?)"
     const values=[
         req.body.repId,
         req.body.customerId,
@@ -112,72 +223,67 @@ app.post('/saveSale',(req,result)=>{
         req.body.qty,
         req.body.paymentMethod,
         req.body.bank,
+        req.body.chequeNo,
         req.body.branch,
         req.body.amount,
         req.body.remarks
     ]
 
-    db.query(sql,[values],(err,res)=>{
+    db.query(sql,values,(err,result)=>{
         if(err) return res.json(err)
         return res.json(result)
     })
-
 })
+
 
 app.post('/login',(req,res)=>{
-    const sql="SELECT * FROM user WHERE userName=? AND pw=?";
+    const sql="SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
     const values=[
         req.body.userName,
-        req.body.pw
+        req.body.pw,
+        'rep'
     ]
 
-    db.query(sql,[values],(err,result)=>{
-        if(err) return res.json(err)
-        return res.json(result)
+    db.query(sql, values, (err, result) => {
+    if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+    const id=result[0].id;
+    const token =jwt.sign({id},"jwtsecretkey",{expiresIn:300})
+    return res.json({Login:true,token,result})
     })
 })
 
-app.get('/getReps',(req,res)=>{
-    const sql="SELECT * FROM user WHERE type=rep"
+app.get('/getReps/:id',verifyJwt, (req, res) => {
+    const repId = req.params.id;
 
-    db.query(sql,(err,result)=>{
-        if(err) return res.json({Message:"Error"})
-        return res.json(result)
-    })
-})
+    const sql = "SELECT * FROM user WHERE id = ?";
 
-app.get('/getSalesLeaders',(req,res)=>{
-    const sql ="SELECT * FROM user WHERE type=leader"
-
-    db.query(sql,(err,result)=>{
-        if(err) return res.json({Message:"Error"})
-        return res.json(result)
-    })
-})
-
-app.get('/getRepRoot',(req,res)=>{
-    const sql="SELECT * FROM "
-})
-
-
-app.get('/getCustomerDetails',(req,res)=>{
-    const sql="SELECT * FROM customer WHERE name=? OR mobileNo=?"
-    const values=[
-        req.body.name,
-        req.body.mobileNo
-    ]
-    db.query(sql,[values],(err,result)=>{
-        if(err) return res.json({Message:"Error"})
+    db.query(sql, repId, (err, result) => {
+        if (err) {
+            return res.json({Message: "Error"});
+        }
         return res.json(result);
+    });
+});
+
+app.get('/getAllReps', verifyJwt,(req, res) => {
+    const type = "rep";
+    const sql = "SELECT * FROM user WHERE type=?"
+
+    db.query(sql, type, (err, result) => {
+        if (err) return res.json({Message: "Error"})
+        return res.json(result)
     })
 })
 
-app.get('/getReps/:managerId', (req, res) => {
+app.get('/getRepsByManager/:managerId', verifyJwt,(req, res) => {
     const manageId = req.params.managerId;
 
     const sql = "SELECT * FROM user WHERE managerId = ?";
 
-    db.query(sql, [manageId], (err, result) => {
+    db.query(sql, manageId, (err, result) => {
         if (err) {
             return res.json({ Message: "Error" });
         }
@@ -185,30 +291,81 @@ app.get('/getReps/:managerId', (req, res) => {
     });
 });
 
+app.get('/getSalesLeaders',verifyJwt,(req,res)=>{
+    const val='leader'
+    const sql ="SELECT * FROM user WHERE type=?"
 
-app.get('/checkLastVisit',(req,res)=>{
-    const values=[
-            req.body.repId,
-            req.body.customerId
-    ]
-    const sql="SELECT * FROM sales WHERE repId=? AND customerId=? ORDER BY time ASC"
-
-    db.query(sql,values,(err,result)=>{
-        if(err){
-            return res.json({Message:"Error"})
-        }
-        const latestTimestamp = result[0].time;
-
-        const currentDate = new Date();
-        const timestampDiff = currentDate - latestTimestamp;
-
-  
-        const twoWeeksInMillis = 2 * 7 * 24 * 60 * 60 * 1000;
-        return timestampDiff > twoWeeksInMillis;
+    db.query(sql,val,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result)
     })
 })
 
-app.get('/customerSearch/:val',(req,res)=>{
+app.get('/getRepRoot',verifyJwt,(req,res)=>{
+    const sql="SELECT * FROM "
+})
+
+
+app.get('/getCustomerDetails',verifyJwt,(req,res)=>{
+    const sql="SELECT * FROM customer WHERE name=? OR mobileNo=?"
+    const values=[
+        req.body.name,
+        req.body.mobileNo
+    ]
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result);
+    })
+})
+
+
+
+app.post('/checkLastVisit', verifyJwt,(req, res) => {
+    console.log(req.body);
+    const repId = req.body.repId; // Get repId from query parameters
+    const twoWeeksInMillis = 2 * 7 * 24 * 60 * 60 * 1000; // Two weeks in milliseconds
+
+    const sql = `
+        SELECT c.id, MAX(s.time) AS lastSaleTime
+        FROM customer AS c
+        LEFT JOIN sales AS s ON c.id = s.customerId
+        WHERE c.repId = ? AND s.repId = ?
+        GROUP BY c.id
+    `;
+
+    const values = [repId, repId];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json({ Message: "Error" });
+        }
+
+        const currentDate = new Date();
+        const customers = result.map((row) => {
+            const lastSaleTime = row.lastSaleTime ? new Date(row.lastSaleTime) : null;
+            const isWithinTwoWeeks =
+                lastSaleTime !== null && currentDate - lastSaleTime <= twoWeeksInMillis;
+
+            return {
+                customerId: row.id,
+                lastSaleTime: lastSaleTime,
+                isWithinTwoWeeks: isWithinTwoWeeks,
+            };
+        });
+
+        const customersNotVisitedWithinTwoWeeks = customers
+            .filter((customer) => !customer.isWithinTwoWeeks)
+            .map((customer) => customer.customerId); // Extract only the customer IDs
+
+        const customerIdsCSV = customersNotVisitedWithinTwoWeeks.join(','); // Convert to a comma-separated string
+
+        return res.json({ customerIds: customerIdsCSV }); // Send the comma-separated list in the response
+    });
+});
+
+
+
+app.get('/customerSearch/:val',verifyJwt,(req,res)=>{
     const value=req.params.val
     const sql="SELECT * FROM customer WHERE name=? OR mobileNo=?"
     const values=[
@@ -223,7 +380,7 @@ app.get('/customerSearch/:val',(req,res)=>{
     })
 })
 
-app.get('/getCustomerById',(req,res)=>{
+app.post('/getCustomerById',verifyJwt,(req,res)=>{
     const id=req.body.id;
     const sql="SELECT * FROM customer WHERE id=?"
     db.query(sql,id,(err,result)=>{
@@ -234,7 +391,7 @@ app.get('/getCustomerById',(req,res)=>{
     })
 })
 
-app.get('/getCustomerByName',(req,res)=>{
+app.post('/getCustomerByName',verifyJwt,(req,res)=>{
     const nme=req.body.name;
     const sql="SELECT * FROM customer WHERE name=?"
     db.query(sql,nme,(err,result)=>{
@@ -248,8 +405,8 @@ app.get('/getCustomerByName',(req,res)=>{
 
 
 
-app.get('/chechEnteredDate/:id',(req,res)=>{
-    const value=req.params.val;
+app.get('/chechEnteredDate/:id',verifyJwt,(req,res)=>{
+    const value=req.params.id;
     const sql="SELECT time FROM sales WHERE salesId=?"
     db.query(sql,value,(err,result)=>{
         if(err){
@@ -262,12 +419,12 @@ app.get('/chechEnteredDate/:id',(req,res)=>{
 
   
         const oneWeeksInMillis =  7 * 24 * 60 * 60 * 1000;
-        return timestampDiff <oneWeeksInMillis;
+         return res.json({ isWithinOneWeek: timestampDiff < oneWeeksInMillis });
     })
 })
 
 
-app.put('/updateSales',(req,res)=>{
+app.put('/updateSales',verifyJwt,(req,res)=>{
     const values=[       
         req.body.repId,
         req.body.customerId,
@@ -290,5 +447,105 @@ app.put('/updateSales',(req,res)=>{
         }
 
         return res.json(result);
+    })
+})
+
+app.get('/getCustomerLocations', verifyJwt,(req, res) => {
+    const sql = "SELECT lat,lng FROM customer"
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/getAllCustomerDetails', verifyJwt,(req, res) => {
+    const sql = "SELECT * FROM customer"
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json({Message: "Error"})
+        return res.json(result);
+    })
+})
+
+
+app.get('/leaderlogin', (req, res) => {
+    const {userName, pw} = req.query;
+    const type = "leader";
+    const sql = "SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
+    const values = [
+        userName,
+        pw,
+        type
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (result.length > 0) {
+            const id=result[0].id;
+            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
+            return res.json({Login:true,token,result})
+        } else {
+            return res.status(401).send('Login failed');
+        }
+    });
+});
+
+app.get('/adminlogin',(req, res) => {
+    const {userName, pw} = req.query;
+    const type = "admin";
+    const sql = "SELECT * FROM user WHERE userName=? AND pw=? AND type=?";
+    const values = [
+        userName,
+        pw,
+        type
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (result.length > 0) {
+            const id=result[0].id;
+            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
+            return res.json({Login:true,token,result})
+        } else {
+            return res.status(401).send('Login failed');
+        }
+    });
+});
+
+app.put('/updateUser',verifyJwt, (req, res) => {
+
+    const sql = 'UPDATE user SET name = ?,userName = ?,pw = ?,mobileNo = ?,address = ?,type = ?,managerId = ? WHERE id =?';
+
+    const values = [
+        req.body.name,
+        req.body.userName,
+        req.body.pw,
+        req.body.mobileNo,
+        req.body.address,
+        req.body.type,
+        req.body.managerId,
+        req.body.id
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) return res.json({Message: "Error"})
+        return res.json(result);
+    })
+})
+
+app.put('/deletUser/:id',verifyJwt,(req,res)=>{
+    const sql="UPDATE user SET type=? WHERE id =?"
+    const values=[
+        'nullUser',
+        req.params.id
+    ]
+
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result)
     })
 })
