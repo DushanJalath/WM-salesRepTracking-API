@@ -549,3 +549,16 @@ app.put('/deletUser/:id',verifyJwt,(req,res)=>{
         return res.json(result)
     })
 })
+
+app.put('/deleteUser/:id',(req,res)=>{
+    const sql="UPDATE user SET type=? WHERE id =?"
+    const values=[
+        'nullUser',
+        req.params.id
+    ]
+
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result)
+    })
+})
