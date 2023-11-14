@@ -250,7 +250,7 @@ app.post('/login',(req,res)=>{
         return res.status(500).json({ error: "Internal server error" });
     }
     const id=result[0].id;
-    const token =jwt.sign({id},"jwtsecretkey",{expiresIn:300})
+    const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
     return res.json({Login:true,token,result})
     })
 })
