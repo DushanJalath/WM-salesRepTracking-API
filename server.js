@@ -127,7 +127,7 @@ app.get('/getSalesData/:id', verifyJwt,(req, res) => {
 });
 
 app.post('/getCustomerSalesByRep',verifyJwt,(req,res)=>{
-    const sql="SELECT * FROM sales WHERE repId=?";
+    const sql="SELECT sales.*, customer.name AS customerName FROM sales JOIN customer ON sales.customerId = customer.id WHERE sales.repId = ?";
     const id=req.body.id;
     db.query(sql,id,(err,result)=>{
         if(err) return res.json(err);
@@ -139,8 +139,7 @@ app.post('/getCustomerSalesByRep',verifyJwt,(req,res)=>{
 
 
 app.get('/getrepContact', verifyJwt,(req, res) => {
-    const sql="SELECT sales.*, customer.name AS customerName FROM sales JOIN customer ON sales.customerId = customer.id WHERE sales.repId = ?";
-
+    const sql = "SELECT id,mobileNo FROM user"
     db.query(sql, (err, result) => {
         if (err) return res.json(err)
         return res.json(result);
