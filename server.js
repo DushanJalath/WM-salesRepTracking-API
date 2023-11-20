@@ -139,7 +139,7 @@ app.post('/getCustomerSalesByRep',verifyJwt,(req,res)=>{
 
 
 app.get('/getrepContact', verifyJwt,(req, res) => {
-    const sql = "SELECT id,mobileNo FROM user"
+    const sql="SELECT sales.*, customer.name AS customerName FROM sales JOIN customer ON sales.customerId = customer.id WHERE sales.repId = ?";
 
     db.query(sql, (err, result) => {
         if (err) return res.json(err)
