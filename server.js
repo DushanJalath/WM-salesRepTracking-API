@@ -269,7 +269,7 @@ app.get('/getReps/:id',verifyJwt, (req, res) => {
 
 app.get('/getAllReps', verifyJwt,(req, res) => {
     const type = "rep";
-    const sql = "SELECT * FROM user WHERE type=?"
+    const sql = "SELECT u.*, m.name AS managerName FROM user AS u LEFT JOIN user AS m ON u.managerId = m.id WHERE u.type = ?"
 
     db.query(sql, type, (err, result) => {
         if (err) return res.json({Message: "Error"})
