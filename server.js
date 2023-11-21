@@ -54,7 +54,7 @@ app.post('/getCustomerSales',verifyJwt,(req,res)=>{
 })
 
 app.get('/getSalesData',verifyJwt,(req,res)=>{
-    const sql="SELECT * FROM sales"
+    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
@@ -174,7 +174,7 @@ app.get('/getRepsLocation/:repId', verifyJwt,(req, res) => {
 app.get('/getSalesDataBydate/:repId', verifyJwt,(req, res) => {
     const repId = req.params.repId;
     const currentDate = new Date().toISOString().slice(0, 10); // Get the current date in 'YYYY-MM-DD' format
-    const sql = "SELECT * FROM sales WHERE repId = ? AND DATE(time) = ?";
+    const sql = "SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id WHERE sales.repId = ? AND DATE(sales.time) = ?";
 
     db.query(sql, [repId, currentDate], (err, result) => {
         if (err) return res.json(err);
