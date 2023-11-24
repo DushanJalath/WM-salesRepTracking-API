@@ -249,7 +249,7 @@ app.post('/login',(req,res)=>{
         return res.status(500).json({ error: "Internal server error" });
     }
     const id=result[0].id;
-    const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
+    const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{ expiresIn: '1h' })
     return res.json({Login:true,token,result})
     })
 })
@@ -483,7 +483,7 @@ app.get('/leaderlogin', (req, res) => {
         }
         if (result.length > 0) {
             const id=result[0].id;
-            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
+            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{ expiresIn: '1h' })
             return res.json({Login:true,token,result})
         } else {
             return res.status(401).send('Login failed');
@@ -507,7 +507,7 @@ app.get('/adminlogin',(req, res) => {
         }
         if (result.length > 0) {
             const id=result[0].id;
-            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{expiresIn:300})
+            const token =jwt.sign({id},process.env.JWT_SECRET_KEY,{ expiresIn: '1h' })
             return res.json({Login:true,token,result})
         } else {
             return res.status(401).send('Login failed');
