@@ -403,6 +403,19 @@ app.post('/getCustomerByName',verifyJwt,(req,res)=>{
 })
 
 
+app.post('/getCustomerContact',verifyJwt,(req,res)=>{
+    const nme=req.body.name;
+    const sql="SELECT * FROM customer WHERE mobileNo=?"
+    db.query(sql,nme,(err,result)=>{
+        if(err){
+            return res.json({Message:"Error"})
+        }
+        return res.json(result);
+    })
+
+})
+
+
 
 app.get('/chechEnteredDate/:id',verifyJwt,(req,res)=>{
     const value=req.params.id;
