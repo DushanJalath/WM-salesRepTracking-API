@@ -404,7 +404,7 @@ app.post('/getCustomerByName',verifyJwt,(req,res)=>{
 
 
 app.post('/getCustomerContact',verifyJwt,(req,res)=>{
-    const nme=req.body.name;
+    const nme=req.body.contact;
     const sql="SELECT * FROM customer WHERE mobileNo=?"
     db.query(sql,nme,(err,result)=>{
         if(err){
