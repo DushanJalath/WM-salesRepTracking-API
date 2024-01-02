@@ -99,7 +99,8 @@ app.post('/regUser',verifyJwt,(req,res)=>{
 
 app.get('/SalesData/:id', verifyJwt,(req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM sales WHERE salesId = ? SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id WHERE sales.salesId=8"
+    const sql = " SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id WHERE sales.salesId=?"
+    
 
     db.query(sql, id, (err, result) => {
         if (err) return res.json(err)
