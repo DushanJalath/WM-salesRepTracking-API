@@ -99,7 +99,7 @@ app.post('/regUser',verifyJwt,(req,res)=>{
 
 app.get('/SalesData/:id', verifyJwt,(req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM sales WHERE salesId = ?"
+    const sql = "SELECT * FROM sales WHERE salesId = ? SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id WHERE sales.salesId=8"
 
     db.query(sql, id, (err, result) => {
         if (err) return res.json(err)
@@ -572,5 +572,14 @@ app.put('/deleteUser/:id',(req,res)=>{
     db.query(sql,values,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result)
+    })
+})
+
+app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
+    const sql="SELECT l.repId, r.name, r.mobileNo, r.address, l.lat, l.lng, l.timeStamp FROM location l JOIN user r ON l.repId = r.id JOIN (SELECT repId, MAX(timestamp) as max_timestamp FROM location GROUP BY repId) latest ON l.repId = latest.repId AND l.timeStamp = latest.max_timestamp"
+    
+    db.query(sql,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result);
     })
 })
