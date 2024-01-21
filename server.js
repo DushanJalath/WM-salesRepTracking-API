@@ -54,7 +54,7 @@ app.post('/getCustomerSales',verifyJwt,(req,res)=>{
 })
 
 app.get('/getSalesData',verifyJwt,(req,res)=>{
-    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.name FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
+    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.* FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
@@ -199,7 +199,7 @@ app.post('/saveLocation',verifyJwt,(req,res)=>{
 
 
 app.post('/regCustomer',verifyJwt,(req,res)=>{
-    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng) VALUES (?,?,?,?,?,?)";
+    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng,postalCode,province,district,wmCustomerOrNot,typeOfMachine,additionalNo,eMail,socialMediaLinks) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     const values=[
         req.body.name,
         req.body.address,
@@ -581,6 +581,54 @@ app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
+        return res.json(result);
+    })
+})
+
+app.get('/getNoOfTimeRepVisited/:id',verifyJwt,(req,res)=>{
+    const sql="SELECT COUNT(*) AS noOfTimeRepVisited FROM sales WHERE repId = ? AND time >= CURDATE() - INTERVAL 1 MONTH AND time < CURDATE()"
+    const id=req.params.id;
+    db.query(sql,id,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result);
+    })
+})
+
+app.get('/saleForGivenCustomer/:id',verifyJwt,(req,res)=>{
+    const sql="SELECT COUNT(*) AS allSales FROM sales WHERE customerId = ? AND qty != 0"
+    const id=req.params.id;
+    db.query(sql,id,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result);
+    })
+})
+
+app.post('/saveProducts',verifyJwt,(req,res)=>{
+    const sql="INSERT INTO products (productName) VALUES (?,)";
+    const values=[
+        req.body.productName
+    ]
+
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/geProducts',verifyJwt,(req,res)=>{
+    const sql="SELECT * FROOM products";
+
+    db.query(sql,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
+    const sql="SELECT * FROOM products WHERE productName=?";
+    const val=req.params.productName
+    db.query(sql,val,(err,result)=>{
+        if(err) return res.json(err)
         return res.json(result);
     })
 })
