@@ -199,14 +199,23 @@ app.post('/saveLocation',verifyJwt,(req,res)=>{
 
 
 app.post('/regCustomer',verifyJwt,(req,res)=>{
-    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng,postalCode,province,district,wmCustomerOrNot,typeOfMachine,additionalNo,eMail,socialMediaLinks) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng,postalCode,province,district,wmCustomerOrNot,additionalNo,eMail,socialMediaLinks,machines,machineCount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     const values=[
         req.body.name,
         req.body.address,
-        req.body.mobileNo,
+        req.body.contactDetails,
         req.body.repId,
         req.body.lat,
-        req.body.lng
+        req.body.lng,
+        req.body.pcode,
+        req.body.province,
+        req.body.district,
+        req.body.iscustomer,
+        req.body.addMno,
+        req.body.eMail,
+        req.body.socialLink,
+        req.body.machines,
+        req.body.machinecount        
     ]
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err);
