@@ -54,7 +54,7 @@ app.post('/getCustomerSales',verifyJwt,(req,res)=>{
 })
 
 app.get('/getSalesData',verifyJwt,(req,res)=>{
-    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo, customer.* FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
+    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo as userMobile, customer.* FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
@@ -613,7 +613,7 @@ app.get('/saleForGivenCustomer/:id',verifyJwt,(req,res)=>{
 })
 
 app.post('/saveProducts',verifyJwt,(req,res)=>{
-    const sql="INSERT INTO products (productName) VALUES (?,)";
+    const sql="INSERT INTO products (productName) VALUES (?)";
     const values=[
         req.body.productName
     ]
@@ -625,7 +625,7 @@ app.post('/saveProducts',verifyJwt,(req,res)=>{
 })
 
 app.get('/geProducts',verifyJwt,(req,res)=>{
-    const sql="SELECT * FROOM products";
+    const sql="SELECT * FROM products";
 
     db.query(sql,(err,result)=>{
         if(err) return res.json(err)
