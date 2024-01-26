@@ -199,7 +199,7 @@ app.post('/saveLocation',verifyJwt,(req,res)=>{
 
 
 app.post('/regCustomer',verifyJwt,(req,res)=>{
-    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng,postalCode,province,district,wmCustomerOrNot,additionalNo,eMail,socialMediaLinks,machines,machineCount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    const sql="INSERT INTO customer (name,address,mobileNo,repId,lat,lng,postalCode,province,district,wmCustomerOrNot,additionalNo,eMail,socialMediaLinks,machines,machineCount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     const values=[
         req.body.name,
         req.body.address,
