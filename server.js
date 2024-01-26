@@ -624,7 +624,7 @@ app.post('/saveProducts',verifyJwt,(req,res)=>{
     })
 })
 
-app.get('/geProducts',verifyJwt,(req,res)=>{
+app.get('/getProducts',verifyJwt,(req,res)=>{
     const sql="SELECT * FROM products";
 
     db.query(sql,(err,result)=>{
@@ -637,6 +637,27 @@ app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
     const sql="SELECT * FROOM products WHERE productName=?";
     const val=req.params.productName
     db.query(sql,val,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/updateProducts',verifyJwt,(req,res)=>{
+    const sql="UPDATE products SET productName = ? WHERE productId = ?";
+    values=[
+        req.params.productName,
+        req.params.id
+    ]
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
+app.get('/deleteProducts/:id',verifyJwt,(req,res)=>{
+    const sql="DELETE FROM products WHERE productId = ?";
+    const id=req.params.id
+    db.query(sql,id,(err,result)=>{
         if(err) return res.json(err)
         return res.json(result);
     })
