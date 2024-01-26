@@ -662,3 +662,16 @@ app.get('/deleteProducts/:id',verifyJwt,(req,res)=>{
         return res.json(result);
     })
 })
+
+app.get('/updateRep',verifyJwt,(req,res)=>{
+    const sql="UPDATE customer SET repId = ? WHERE id = ?";
+    values=[
+        req.params.repId,
+        req.params.id
+    ]
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json(err)
+        return res.json(result);
+    })
+})
+
