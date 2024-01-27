@@ -643,7 +643,7 @@ app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
 })
 
 app.put('/updateProducts',verifyJwt,(req,res)=>{
-    const sql="UPDATE products SET productName = ? WHERE productId = ?";
+    const sql="UPDATE products SET productName = ? WHERE id = ?";
     const values=[
         req.body.productName,
         req.body.id
