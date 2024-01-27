@@ -644,7 +644,7 @@ app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
 
 app.put('/updateProducts',verifyJwt,(req,res)=>{
     const sql="UPDATE products SET productName = ? WHERE productId = ?";
-    values=[
+    const values=[
         req.body.productName,
         req.body.id
     ]
@@ -665,7 +665,7 @@ app.delete('/deleteProducts/:id',verifyJwt,(req,res)=>{
 
 app.put('/updateRep',verifyJwt,(req,res)=>{
     const sql="UPDATE customer SET repId = ? WHERE id = ?";
-    values=[
+    const values=[
         req.body.repId,
         req.body.id
     ]
