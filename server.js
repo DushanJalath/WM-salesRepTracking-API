@@ -645,8 +645,8 @@ app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
 app.put('/updateProducts',verifyJwt,(req,res)=>{
     const sql="UPDATE products SET productName = ? WHERE productId = ?";
     values=[
-        req.params.productName,
-        req.params.id
+        req.body.productName,
+        req.body.id
     ]
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err)
@@ -655,7 +655,7 @@ app.put('/updateProducts',verifyJwt,(req,res)=>{
 })
 
 app.delete('/deleteProducts/:id',verifyJwt,(req,res)=>{
-    const sql="DELETE FROM products WHERE productId = ?";
+    const sql="DELETE FROM products WHERE id = ?";
     const id=req.params.id
     db.query(sql,id,(err,result)=>{
         if(err) return res.json(err)
@@ -666,8 +666,8 @@ app.delete('/deleteProducts/:id',verifyJwt,(req,res)=>{
 app.put('/updateRep',verifyJwt,(req,res)=>{
     const sql="UPDATE customer SET repId = ? WHERE id = ?";
     values=[
-        req.params.repId,
-        req.params.id
+        req.body.repId,
+        req.body.id
     ]
     db.query(sql,values,(err,result)=>{
         if(err) return res.json(err)
