@@ -374,8 +374,8 @@ app.post('/checkLastVisit', verifyJwt,(req, res) => {
 
 
 
-app.get('/customerSearch/:val',verifyJwt,(req,res)=>{
-    const value=req.params.val
+app.get('/customerSearch',verifyJwt,(req,res)=>{
+    const value=req.body.val
     const sql="SELECT * FROM customer WHERE name=? OR mobileNo=?"
     const values=[
         value,
@@ -586,7 +586,7 @@ app.put('/deleteUser/:id',(req,res)=>{
 })
 
 app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
-    const sql="SELECT l.repId, r.name, r.mobileNo, r.address, l.lat, l.lng, l.timeStamp FROM location l JOIN user r ON l.repId = r.id JOIN (SELECT repId, MAX(timestamp) as max_timestamp FROM location GROUP BY repId) latest ON l.repId = latest.repId AND l.timeStamp = latest.max_timestamp"
+    const sql="SELECT l.repId, r.name AS repName, r.mobileNo AS repMobileNo, r.address AS repAddress,c.name AS customerName, c.mobileNo AS customerMobileNo, c.address AS customerAddress,l.lat, l.lng, l.timeStamp FROM location l JOIN user r ON l.repId = r.id JOIN (SELECT repId, MAX(timestamp) AS max_timestamp FROM location GROUP BY repId) latest ON l.repId = latest.repId AND l.timeStamp = latest.max_timestamp JOIN customer c ON r.id = c.repId"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
@@ -594,9 +594,12 @@ app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
     })
 })
 
-app.get('/getNoOfTimeRepVisited/:id',verifyJwt,(req,res)=>{
-    const sql="SELECT COUNT(*) AS noOfTimeRepVisited FROM sales WHERE repId = ? AND time >= CURDATE() - INTERVAL 1 MONTH AND time < CURDATE()"
-    const id=req.params.id;
+app.get('/getNoOfTimeRepVisited/',verifyJwt,(req,res)=>{
+    const sql="SELECT COUNT(*) AS noOfTimeRepVisited FROM sales WHERE repId = ? AND customerId=? AND time >= CURDATE() - INTERVAL 1 MONTH AND time < CURDATE()"
+    const values=[
+        req.body.repId,
+        req.body.customerId
+    ]
     db.query(sql,id,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result);
