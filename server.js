@@ -586,7 +586,7 @@ app.put('/deleteUser/:id',(req,res)=>{
 })
 
 app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
-    const sql="SELECT l.repId, r.name AS repName, r.mobileNo AS repMobileNo, r.address AS repAddress,c.name AS customerName, c.mobileNo AS customerMobileNo, c.address AS customerAddress,l.lat, l.lng, l.timeStamp FROM location l JOIN user r ON l.repId = r.id JOIN (SELECT repId, MAX(timestamp) AS max_timestamp FROM location GROUP BY repId) latest ON l.repId = latest.repId AND l.timeStamp = latest.max_timestamp JOIN customer c ON r.id = c.repId"
+    const sql="SELECT l.repId, r.name, r.mobileNo, r.address, l.lat, l.lng, l.timeStamp FROM location l JOIN user r ON l.repId = r.id JOIN (SELECT repId, MAX(timestamp) as max_timestamp FROM location GROUP BY repId) latest ON l.repId = latest.repId AND l.timeStamp = latest.max_timestamp"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
