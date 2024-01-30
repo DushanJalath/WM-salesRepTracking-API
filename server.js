@@ -374,7 +374,7 @@ app.post('/checkLastVisit', verifyJwt,(req, res) => {
 
 
 
-app.get('/customerSearch',verifyJwt,(req,res)=>{
+app.post('/customerSearch',verifyJwt,(req,res)=>{
     const value=req.body.val
     const sql="SELECT * FROM customer WHERE name=? OR mobileNo=?"
     const values=[
