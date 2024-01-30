@@ -594,13 +594,10 @@ app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
     })
 })
 
-app.post('/getNoOfTimeRepVisited',verifyJwt,(req,res)=>{
-    const sql="SELECT COUNT(*) AS numberOfRecordsFROM sales WHERE customerId = your_customer_id AND time >= DATE_SUB(NOW(), INTERVAL 1 MONTH)"
-    const values=[
-        req.body.repId,
-        req.body.customerId
-    ]
-    db.query(sql,id,(err,result)=>{
+app.get('/getNoOfTimeRepVisited/:id',verifyJwt,(req,res)=>{
+    const sql="SELECT COUNT(*) AS numberOfRecordsFROM sales WHERE customerId = ? AND time >= DATE_SUB(NOW(), INTERVAL 1 MONTH)"
+    
+    db.query(sql,req.params.id,(err,result)=>{
         if(err) return res.json({Message:"Error"})
         return res.json(result);
     })
