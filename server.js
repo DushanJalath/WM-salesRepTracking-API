@@ -595,7 +595,7 @@ app.get('/getRepLatestLocation',verifyJwt,(req,res)=>{
 })
 
 app.post('/getNoOfTimeRepVisited',verifyJwt,(req,res)=>{
-    const sql="SELECT COUNT(*) AS noOfTimeRepVisited FROM sales WHERE repId = ? AND customerId=? AND time >= CURDATE() - INTERVAL 1 MONTH AND time < CURDATE()"
+    const sql="SELECT COUNT(*) AS numberOfRecordsFROM sales WHERE customerId = your_customer_id AND time >= DATE_SUB(NOW(), INTERVAL 1 MONTH)"
     const values=[
         req.body.repId,
         req.body.customerId
