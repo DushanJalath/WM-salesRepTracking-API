@@ -54,7 +54,7 @@ app.post('/getCustomerSales',verifyJwt,(req,res)=>{
 })
 
 app.get('/getSalesData',verifyJwt,(req,res)=>{
-    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo as userMobile, customer.* FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id"
+    const sql="SELECT sales.*, user.name AS repUserName, user.mobileNo AS userMobile, customer.* FROM sales JOIN user ON sales.repId = user.id JOIN customer ON sales.customerId = customer.id WHERE user.name != 'Developer'"
     
     db.query(sql,(err,result)=>{
         if(err) return res.json({Message:"Error"})
