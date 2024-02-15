@@ -613,9 +613,10 @@ app.get('/saleForGivenCustomer/:id',verifyJwt,(req,res)=>{
 })
 
 app.post('/saveProducts',verifyJwt,(req,res)=>{
-    const sql="INSERT INTO products (productName) VALUES (?)";
+    const sql="INSERT INTO products (productName,pType) VALUES (?,?)";
     const values=[
-        req.body.productName
+        req.body.productName,
+        req.body.pType
     ]
 
     db.query(sql,values,(err,result)=>{
@@ -643,9 +644,10 @@ app.get('/searchProduct/:productName',verifyJwt,(req,res)=>{
 })
 
 app.put('/updateProducts',verifyJwt,(req,res)=>{
-    const sql="UPDATE products SET productName = ? WHERE id = ?";
+    const sql="UPDATE products SET productName = ?,pType=? WHERE id = ?";
     const values=[
         req.body.productName,
+        req.body.pType,
         req.body.id
     ]
     db.query(sql,values,(err,result)=>{
