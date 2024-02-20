@@ -677,3 +677,25 @@ app.put('/updateRep',verifyJwt,(req,res)=>{
     })
 })
 
+app.get('/getProductsMobile', verifyJwt, (req, res) => {
+    const sql = "SELECT * FROM products GROUP BY pType";
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err);
+
+        // Process the result to create the desired JSON structure
+        const processedData = {};
+        result.forEach((row) => {
+            const { pType, ...rest } = row;
+            if (!processedData[pType]) {
+                processedData[pType] = [rest];
+            } else {
+                processedData[pType].push(rest);
+            }
+        });
+
+        const finalData = { Data: processedData };
+
+        return res.json(finalData);
+    });
+});
