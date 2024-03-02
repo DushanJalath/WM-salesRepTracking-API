@@ -678,7 +678,7 @@ app.put('/updateRep',verifyJwt,(req,res)=>{
 })
 
 app.get('/getProductsMobile', verifyJwt, (req, res) => {
-    const sql = "SELECT * FROM products GROUP BY pType";
+    const sql = "SELECT productName FROM products GROUP BY pType";
 
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
@@ -699,3 +699,30 @@ app.get('/getProductsMobile', verifyJwt, (req, res) => {
         return res.json(finalData);
     });
 });
+
+app.put('/updateCustomer',verifyJwt,(req,res)=>{
+    const sql="UPDATE customer SET name = ?,address = ?,repId = ?,lat = ?,lng = ?,postalCode =?,province = ?,district = ?,wmCustomerOrNot = ?,typeOfMachine =?,additionalNo= ?,eMail=?,socialMediaLinks = ?,machines=?,machineCount= ? WHERE mobileNo = ?"
+    const values=[
+        req.body.name,
+        req.body.address,
+        req.body.repId,
+        req.body.lat,
+        req.body.lng,
+        req.body.postalCode,
+        req.body.provice,
+        req.body.district,
+        req.body.wmCustomerOrNot,
+        req.body.typeOfMachine,
+        req.body.additionalNo,
+        req.body.eMail,
+        req.body.socialMediaLinks,
+        req.body.machines,
+        req.body.machineCount,
+        req.body.mobileNo
+    ]
+
+    db.query(sql,values,(err,result)=>{
+        if(err) return res.json({Message:"Error"})
+        return res.json(result)
+    })
+})
