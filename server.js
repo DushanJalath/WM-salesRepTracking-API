@@ -682,21 +682,7 @@ app.get('/getProductsMobile', verifyJwt, (req, res) => {
 
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
-
-        // Process the result to create the desired JSON structure
-        const processedData = {};
-        result.forEach((row) => {
-            const { pType, ...rest } = row;
-            if (!processedData[pType]) {
-                processedData[pType] = [rest];
-            } else {
-                processedData[pType].push(rest);
-            }
-        });
-
-        const finalData = { Data: processedData };
-
-        return res.json(finalData);
+        return res.json(result);
     });
 });
 
